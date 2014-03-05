@@ -26,7 +26,7 @@ class HomePageTest(TestCase):
 		response = home_page(request)
 
 		self.assertEqual(Item.objects.count(),1)
-		new_item = Item.objects.first()
+		new_item = Item.objects.all()[0]
 		self.assertEqual(new_item.text, 'A new list item')
 
 	def test_home_page_redirects_after_POST(self):
