@@ -96,5 +96,5 @@ class NewVisitorTest(LiveServerTestCase):
 		self.assertAlmostEqual(
 			inputbox.location['x'] + inputbox.size['width'] / 2,
 			512,
-			delta=5
+			delta=10
 		)
