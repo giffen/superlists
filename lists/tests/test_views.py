@@ -1,11 +1,11 @@
-from django.utils.html import escape
-from django.template.loader import render_to_string
 from django.core.urlresolvers import resolve
-from django.test import TestCase
 from django.http import HttpRequest
+from django.template.loader import render_to_string
+from django.test import TestCase
+from django.utils.html import escape
 
-from lists.views import home_page
 from lists.models import Item, List
+from lists.views import home_page
 
 class HomePageTest(TestCase):
 
@@ -79,12 +79,12 @@ class ListViewTest(TestCase):
 		correct_list = List.objects.create()
 
 		self.client.post(
-			'/lists/%d/' % (correct_list.id,),
-			data={'item_text': 'A new item for an existing list'}
+		    '/lists/%d/' % (correct_list.id,),
+		    data={'item_text': 'A new item for an existing list'}
 		)
 
-		self.assertEqual(Item.objects.count(),1)
-		new_item = Item.objects.all()[0]
+		self.assertEqual(Item.objects.count(), 1)
+		new_item = Item.objects.first()
 		self.assertEqual(new_item.text, 'A new item for an existing list')
 		self.assertEqual(new_item.list, correct_list)
 
@@ -98,3 +98,14 @@ class ListViewTest(TestCase):
 		)
 
 		self.assertRedirects(response, 'lists/%d/' % (correct_list.id,))
+
+	def test_validation_errors_end_up_on_lists_page(self):
+		list_ = List.objects.create()
+		response = self.client.post(
+			'/lists/%d/' % (list_.id,),
+			data={'item_text': ''}
+		)
+		self.assertEqual(response.status_code, 200)
+		self.assertTemplateUsed(response, 'list.html')
+		expected_error = escape("You can't have an empty list item")
+		self.assertContains(response, expected_error)
